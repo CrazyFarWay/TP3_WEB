@@ -20,7 +20,13 @@ async function checkEmployee(req,res,next){
     next();
 }
 
-// GET /api/v1/empelado/:id/salarios
+// GET /api/v1/empleados
+router.get('/',async (req,res)=>{
+    const employees = await DB.Employees.getAll();    
+    res.status(200).json(employees)
+});
+
+// GET /api/v1/empleados/:id/salarios
 router.get('/:id/salarios',checkEmployee,async (req,res)=>{    
     const salaries = await DB.Employees.getSalariosEmpleado(res.locals.employee);
     res.status(200).json(salaries)

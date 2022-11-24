@@ -2,6 +2,23 @@ const pool = require("./connection.db");
 const TABLE='employees'
 
 /**
+ * Retorna todos los empleados
+ * @returns 
+ */
+module.exports.getAll = async function () {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query(`SELECT * FROM ${TABLE} e `);
+    return rows;
+  } catch (err) {
+    return Promise.reject(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+/**
  * Retorna un departamento por su clave primaria
  * @returns 
  */
@@ -29,14 +46,12 @@ module.exports.getById = async function (id) {
     conn = await pool.getConnection();
     const SQL=`
 SELECT 
-  e.*,
-  s.from_date AS fecha_desde
+  *
 FROM salaries s
-    INNER JOIN employees e ON (e.emp_no = s.emp_no)
-WHERE s.emp_no = ? AND s.to_date='9999-01-01'
+WHERE s.emp_no = ? 
 `;
-    const rows = await conn.query(SQL,[departamento.dept_no]);
-    return rows[0];
+    const rows = await conn.query(SQL,[empleado.emp_no]);
+    return rows;
   } catch (err) {
     return Promise.reject(err);
   } finally {
