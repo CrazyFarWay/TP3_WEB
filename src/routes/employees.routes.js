@@ -59,7 +59,7 @@ router.post('/:id/departamentos',checkEmployee,async (req,res)=>{
 
     const isAddOk = await DB.Employees.addEmployeeDepartment(res.locals.employee, newDepartmentId);
     if(isAddOk){
-        const departments = await DB.Departmens.getEmployeeDepartments(res.locals.employee);
+        const departments = await DB.Departments.getEmployeeDepartments(res.locals.employee);
         res.status(200).json(departments)
     }else{
         res.status(500).send('Falló al agregar un departamento!!!')

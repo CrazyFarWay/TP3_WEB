@@ -62,6 +62,28 @@ WHERE dm.dept_no = ? AND dm.to_date='9999-01-01'
 };
 
 /**
+ * Retorna el listado de managers de un Departamento
+ * @param {Object} departamento 
+ * @returns 
+ */
+ module.exports.getDepartmentManagers = async function (departamento) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const SQL=`
+SELECT * FROM dept_manager dm 
+WHERE dm.dept_no = ?
+`;
+    const rows = await conn.query(SQL,[departamento.dept_no]);
+    return rows;
+  } catch (err) {
+    return Promise.reject(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+/**
  * Retorna los departamentos de un empleado
  * @param {Object} empleado 
  * @returns 
@@ -137,6 +159,36 @@ module.exports.update = async function (departamento) {
     params[0]=departamento.dept_name
     params[1]=departamento.dept_no    
     const rows = await conn.query(SQL,params);
+    return rows;
+  } catch (err) {
+    return Promise.reject(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+/**
+ * Actualiza el manager de un departamento
+ * @param {Object} departamento 
+ * @param {String} managerId 
+ * @returns 
+ */
+ module.exports.updateDepartmentManager = async function (departamento, managerId) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const SQL1=`
+UPDATE dept_manager 
+SET to_date = current_date()  
+WHERE dept_no = ? AND to_date = "9999-01-01"
+`;
+    await conn.query(SQL1,[departamento.dept_no]);
+
+    const SQL2=`
+INSERT INTO dept_manager (emp_no, dept_no, from_date, to_date) 
+VALUES (?, ?, current_date(), "9999-01-01")
+`;
+    const rows = await conn.query(SQL2,[managerId, departamento.dept_no]);
     return rows;
   } catch (err) {
     return Promise.reject(err);

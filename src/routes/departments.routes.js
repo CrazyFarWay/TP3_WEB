@@ -10,7 +10,7 @@ const DB = require('../db');
  * @returns 
  */
 async function checkDepto(req,res,next){
-    const depto = await DB.Departmens.getById(req.params.id);
+    const depto = await DB.Departments.getById(req.params.id);
     if(!depto){        
         return res.status(404).send('Departamento no encontrado!!!')
     }
@@ -22,7 +22,7 @@ async function checkDepto(req,res,next){
 
 // GET /api/v1/departamentos
 router.get('/',async (req,res)=>{
-    const deptos = await DB.Departmens.getAll();    
+    const deptos = await DB.Departments.getAll();    
     res.status(200).json(deptos)
 });
 
@@ -33,7 +33,7 @@ router.get('/:id',checkDepto,(req,res)=>{
 
 // GET /api/v1/departamentos/:id/manager
 router.get('/:id/manager',checkDepto,async (req,res)=>{    
-    const manager = await DB.Departmens.getActualManager(res.locals.depto);
+    const manager = await DB.Departments.getActualManager(res.locals.depto);
     res.status(200).json(manager)
 });
 
@@ -48,13 +48,13 @@ router.post('/',async (req,res)=>{
         res.status(400).send('dept_name es Requerido!!!')
         return
     }
-    const depto = await DB.Departmens.getById(dept_no);
+    const depto = await DB.Departments.getById(dept_no);
     if(depto){
         res.status(500).send('ya existe el Departamento!!!')
         return
     }
     const deptoNuevo = {dept_no,dept_name}
-    const isAddOk = await DB.Departmens.add(deptoNuevo)
+    const isAddOk = await DB.Departments.add(deptoNuevo)
     if(isAddOk){
         res.status(201).json(deptoNuevo)
     }else{
@@ -71,7 +71,7 @@ router.put('/:id',checkDepto,async (req,res)=>{
     }
     const {depto} = res.locals;
     depto.dept_name=dept_name
-    const isUpdateOk = await DB.Departmens.update(depto)
+    const isUpdateOk = await DB.Departments.update(depto)
     if(isUpdateOk){
         res.status(200).json(depto)
     }else{
@@ -82,11 +82,28 @@ router.put('/:id',checkDepto,async (req,res)=>{
 // DELETE /api/v1/departamentos/:id
 router.delete('/:id',checkDepto,async (req,res)=>{
     const {depto} = res.locals;
-    const isDeleteOk = await DB.Departmens.delete(depto)
+    const isDeleteOk = await DB.Departments.delete(depto)
     if(isDeleteOk){
         res.status(204).send()
     }else{
         res.status(500).send('Falló al eliminar el departamento!!!')
+    }
+});
+
+// POST /api/v1/departamentos/:id/manager
+router.post('/:id/manager',checkDepto,async (req,res)=>{    
+    const newManagerId = req.body.managerId;
+    if(!newManagerId){
+        res.status(400).send('Campo requerido en el body -> "managerId"');
+        return
+    }
+
+    const isAddOk = await DB.Departments.updateDepartmentManager(res.locals.depto, newManagerId);
+    if(isAddOk){
+        const managers = await DB.Departments.getDepartmentManagers(res.locals.depto);
+        res.status(200).json(managers)
+    }else{
+        res.status(500).send('Falló al agregar un departamento!!!')
     }
 });
 
