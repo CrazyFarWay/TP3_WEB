@@ -49,4 +49,21 @@ router.post('/:id/salarios',checkEmployee,async (req,res)=>{
     }
 });
 
+// POST /api/v1/empleados/:id/departamentos
+router.post('/:id/departamentos',checkEmployee,async (req,res)=>{    
+    const newDepartmentId = req.body.departmentId;
+    if(!newDepartmentId){
+        res.status(400).send('Campo requerido en el body -> "departmentId"');
+        return
+    }
+
+    const isAddOk = await DB.Employees.addEmployeeDepartment(res.locals.employee, newDepartmentId);
+    if(isAddOk){
+        const departments = await DB.Departmens.getEmployeeDepartments(res.locals.employee);
+        res.status(200).json(departments)
+    }else{
+        res.status(500).send('Falló al agregar un departamento!!!')
+    }
+});
+
 module.exports=router

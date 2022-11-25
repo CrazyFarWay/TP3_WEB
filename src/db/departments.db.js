@@ -62,6 +62,28 @@ WHERE dm.dept_no = ? AND dm.to_date='9999-01-01'
 };
 
 /**
+ * Retorna los departamentos de un empleado
+ * @param {Object} empleado 
+ * @returns 
+ */
+ module.exports.getEmployeeDepartments = async function (empleado) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const SQL=`
+SELECT * FROM dept_emp de 
+WHERE emp_no = ?
+`;
+    const rows = await conn.query(SQL,[empleado.emp_no]);
+    return rows;
+  } catch (err) {
+    return Promise.reject(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+/**
  * Agrega un departamento
  * @param {Object} departamento 
  * @returns 

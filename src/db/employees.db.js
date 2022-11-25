@@ -88,3 +88,33 @@ VALUES (?, ?, current_date(), "9999-01-01")
     if (conn) await conn.release();
   }
 };
+
+/**
+ * Crea un nuevo departamento y actualiza la tabla de dept_emp
+ * @param {Object} empleado 
+ * @param {String} departamentoId 
+ * @returns 
+ */
+ module.exports.addEmployeeDepartment = async function (empleado, departamentoId) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const SQL1=`
+UPDATE dept_emp 
+SET to_date = current_date() 
+WHERE emp_no = ? AND to_date = "9999-01-01"
+`;
+    await conn.query(SQL1,[empleado.emp_no]);
+
+    const SQL2=`
+INSERT INTO dept_emp (emp_no, dept_no, from_date, to_date) 
+VALUES (?, ?, current_date(), "9999-01-01")
+`;
+    const rows = await conn.query(SQL2,[empleado.emp_no, departamentoId]);
+    return rows;
+  } catch (err) {
+    return Promise.reject(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
