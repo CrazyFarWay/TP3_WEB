@@ -32,4 +32,21 @@ router.get('/:id/salarios',checkEmployee,async (req,res)=>{
     res.status(200).json(salaries)
 });
 
+// POST /api/v1/empleados/:id/salarios
+router.post('/:id/salarios',checkEmployee,async (req,res)=>{    
+    const newSalary = req.body.salary;
+    if(!newSalary){
+        res.status(400).send('Campo requerido en el body -> "salary"');
+        return
+    }
+
+    const isAddOk = await DB.Employees.addEmployeeSalary(res.locals.employee, newSalary);
+    if(isAddOk){
+        const salaries = await DB.Employees.getSalariosEmpleado(res.locals.employee);
+        res.status(200).json(salaries)
+    }else{
+        res.status(500).send('Falló al agregar un salario!!!')
+    }
+});
+
 module.exports=router
