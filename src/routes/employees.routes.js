@@ -26,12 +26,6 @@ router.get('/',async (req,res)=>{
     res.status(200).json(employees)
 });
 
-// GET /api/v1/empleados/:id/salarios
-router.get('/:id/salarios',checkEmployee,async (req,res)=>{    
-    const salaries = await DB.Employees.getSalariosEmpleado(res.locals.employee);
-    res.status(200).json(salaries)
-});
-
 // POST /api/v1/empleados/:id/salarios
 router.post('/:id/salarios',checkEmployee,async (req,res)=>{    
     const newSalary = req.body.salary;
@@ -47,6 +41,12 @@ router.post('/:id/salarios',checkEmployee,async (req,res)=>{
     }else{
         res.status(500).send('Falló al agregar un salario!!!')
     }
+});
+
+// GET /api/v1/empleados/:id/salarios
+router.get('/:id/salarios',checkEmployee,async (req,res)=>{    
+    const salaries = await DB.Employees.getSalariosEmpleado(res.locals.employee);
+    res.status(200).json(salaries)
 });
 
 // POST /api/v1/empleados/:id/departamentos
