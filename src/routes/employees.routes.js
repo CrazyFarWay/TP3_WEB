@@ -34,6 +34,15 @@ router.post('/:id/salarios',checkEmployee,async (req,res)=>{
         return
     }
 
+    const salaries = await DB.Employees.getSalariosEmpleado(res.locals.employee);
+    let lastModifyDate = salaries.pop().to_date.toISOString().substring(0, 10); //.substring(0, 10); to Truncate the GMT format
+    let currentDate = new Date().toISOString().substring(0, 10);
+
+    if (lastModifyDate == currentDate) {
+        res.status(422).send('No se puede modificar el sueldo de un empleado más de una vez al día');
+        return
+    }
+
     const isAddOk = await DB.Employees.addEmployeeSalary(res.locals.employee, newSalary);
     if(isAddOk){
         const salaries = await DB.Employees.getSalariosEmpleado(res.locals.employee);
@@ -54,6 +63,14 @@ router.post('/:id/departamentos',checkEmployee,async (req,res)=>{
     const newDepartmentId = req.body.departmentId;
     if(!newDepartmentId){
         res.status(400).send('Campo requerido en el body -> "departmentId"');
+        return
+    }
+
+    const departments = await DB.Departments.getEmployeeDepartments(res.locals.employee);
+    let lastDepartment = departments.pop().dept_no;
+
+    if (lastDepartment == newDepartmentId) {
+        res.status(422).send('No se puede mover a un empleado más de una vez al día');
         return
     }
 

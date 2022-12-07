@@ -3,7 +3,7 @@
 ################################################################################
 
 # Variable con la URL base
-@BASE_API=http://localhost:3000
+@BASE_API=http://localhost:3313
 
 ### Obtener raiz
 GET {{BASE_API}}/
@@ -50,3 +50,29 @@ DELETE {{API_DEPARTAMENTOS}}/dinf
 
 ### Obtener departamento con id dinf
 GET {{API_DEPARTAMENTOS}}/dinf
+
+
+# Variable con la URL completa hacia la API de empleados
+@API_EMPLEADOS={{BASE_API}}/api/v1/empleados
+
+### Obtener todos los empleados
+GET {{API_EMPLEADOS}}
+
+### Obtener salarios del empleado con id 10007
+GET {{API_EMPLEADOS}}/10007/salarios
+
+### Modificar salario de empleado con id 10007
+POST {{API_EMPLEADOS}}/10007/salarios
+Content-Type: application/json
+
+{
+    "salary":300
+}
+
+### Mover a un empleado de departamento con id 10007
+POST {{API_EMPLEADOS}}/10018/departamentos
+Content-Type: application/json
+
+{
+    "departmentId":"d006"
+}

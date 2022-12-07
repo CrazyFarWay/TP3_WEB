@@ -7,8 +7,8 @@ describe("Rest API Empleados", () => {
     const response = await request(app).get("/api/v1/empleados");
     expect(response).toBeDefined();
     expect(response.statusCode).toBe(200);
-    const deptos = response.body;
-    expect(deptos.length).toBeGreaterThan(0);
+    const employees = response.body;
+    expect(employees.length).toBeGreaterThan(0);
   });
 
   it("GET /api/v1/empleados/110022/salarios", async () => {
@@ -23,6 +23,12 @@ describe("Rest API Empleados", () => {
       expect(element.emp_no).toBeDefined();
       expect(element.emp_no).toBe(110022);
     });
+  });
+
+  it("GET /api/v1/empleados/110022/salarios", async () => {
+    const response = await request(app).get("/api/v1/empleados/adfd/salarios");
+    expect(response).toBeDefined();
+    expect(response.statusCode).toBe(400);
   });
 
   it("POST /api/v1/empleados/110022/salarios", async () => {
@@ -45,36 +51,57 @@ describe("Rest API Empleados", () => {
 
     expect(salaries.length).toBeGreaterThan(salariesBefore.length);
 
-    const lastSalary = salaries.pop();
     const lastSalaryAfter = salaries.pop();
+    const lastSalaryBefore = salariesBefore.pop();
 
-    //expect(lastSalaryAfter.to_date).toBe(new Date().toISOString());
-    //expect(lastSalaryAfter.from_date).toBe(new Date().toISOString());
-    //expect(lastSalary.to_date).toBe("9999-01-01T03:00:00.000Z");
+    expect(lastSalaryBefore.to_date).toBe(new Date().toISOString());
+    expect(lastSalaryAfter.from_date).toBe(new Date().toISOString());
+    expect(lastSalaryAfter.to_date).toBe("9999-01-01T03:00:00.000Z");
+  });
+
+  it("POST /api/v1/empleados/110022/salarios", async () => {
+    const response = await request(app).post("/api/v1/empleados/asvc/salarios")
+    .send({"salary": 300});
+
+    expect(response).toBeDefined();
+    expect(response.statusCode).toBe(400);
   });
 
   it("POST /api/v1/empleados/110022/departamentos", async () => {
-    // Comprobar que existe empleado
-    // Comprobar que existe departamento destino
-    // Compobar que el depto destino sea distinto al depto actual del empleado
+    const responseGet = await request(app).get("/api/v1/empleados/10018/departamentos");
+    const departmentsBefore = responseGet.body;
+    expect(departmentsBefore).toBeDefined();
 
-    const response = await request(app).post("/api/v1/empleados/10015/departamentos")
-    .send({"departmentId": "d006"});
+    const response = await request(app).post("/api/v1/empleados/10018/departamentos").send({"departmentId": "d002"});
 
     expect(response).toBeDefined();
     expect(response.statusCode).toBe(200);
 
-
     const departments = response.body;
     expect(departments).toBeDefined();
 
-    //expect(departments.length).toBeGreaterThan(departmentsBefore.length);
+    console.log("CANTIDAD DE REGISTROS");
+    console.log(departments.length, departmentsBefore.length);
+    expect(departments.length).toBeGreaterThan(departmentsBefore.length);
 
     const lastDepartmentAfter = departments.pop();
-    const lastDepartmentBefore = departments.pop();
+    const lastDepartmentBefore = departmentsBefore.pop();
+    const currentDate = new Date().toISOString().substring(0, 10);
 
-    //expect(lastDepartmentBefore.to_date).toBe(new Date().toISOString());
-    //expect(lastDepartmentAfter.from_date).toBe(new Date().toISOString());
-    //expect(lastDepartmentAfter.to_date).toBe("9999-01-01T03:00:00.000Z");
+    expect(lastDepartmentBefore.to_date.toISOString().substring(0, 10)).toBe(currentDate);
+    expect(lastDepartmentAfter.from_date.toISOString().substring(0, 10)).toBe(currentDate);
+    expect(lastDepartmentAfter.to_date.toISOString().substring(0, 10)).toBe("9999-01-01");
+  });
+
+  it("POST /api/v1/empleados/0000/departamentos", async () => {
+    const response = await request(app).post("/api/v1/empleados/0000/departamentos").send({"departmentId": "d002"});
+    expect(response).toBeDefined();
+    expect(response.statusCode).toBe(404);
+  });
+
+  it("POST /api/v1/empleados/10018/departamentos", async () => {
+    const response = await request(app).post("/api/v1/empleados/10018/departamentos").send({"departmentId": "d002"});
+    expect(response).toBeDefined();
+    expect(response.statusCode).toBe(422);
   });
 });
