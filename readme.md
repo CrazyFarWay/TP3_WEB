@@ -1,5 +1,5 @@
 # Ejemplo de API Rest usando NodeJS Express y MariaDB
-## Descripción del proyecto
+## Descripción del proyecto hola
 
 El proyecto contiene las siguientes **dependencias de producción**:
 1. **express**  módulo Infraestructura web rápida, minimalista y flexible para Node.js
